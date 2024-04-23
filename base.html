@@ -57,23 +57,87 @@
                                 Submit
                             </button>
                         </form>
-                        {submitted && (
-                            <div class="mt-4 text-gray-700">
-                                <h2 class="text-lg font-semibold">Submitted Coordinates</h2>
-                                <p>Latitude: {latitude}</p>
-                                <p>Longitude: {longitude}</p>
-                            </div>
-                        )}
                     </div>
                 );
             };
+
+            const MultiStopForm = () => {
+                const [stops, setStops] = React.useState([{ latitude: '', longitude: '' }]);
+
+                const addStop = () => {
+                    setStops([...stops, { latitude: '', longitude: '' }]);
+                };
+
+                const removeStop = (index) => {
+                    const updatedStops = stops.filter((_, i) => i !== index);
+                    setStops(updatedStops);
+                };
+                return (
+                    <div>
+                        <h1>Enter Stops Coordination</h1>
+                        <form>
+                            {stops.map((stop, index) => (
+                                <div key={index} className="mb-4">
+                                    <label htmlFor={`latitude-${index}`}
+                                           className="block text-gray-600">Latitude:</label>
+                                    <input
+                                        type="number"
+                                        step="0.0001"
+                                        id={`latitude-${index}`}
+                                        value={stop.latitude}
+                                        onChange={(e) => {
+                                            const updatedStops = [...stops];
+                                            updatedStops[index].latitude = e.target.value;
+                                            setStops(updatedStops);
+                                        }}
+                                        required
+                                    />
+                                    <label htmlFor={`longitude-${index}`}
+                                           className="block text-gray-600">Longitude:</label>
+                                    <input
+                                        type="number"
+                                        step="0.0001"
+                                        id={`longitude-${index}`}
+                                        value={stop.longitude}
+                                        onChange={(e) => {
+                                            const updatedStops = [...stops];
+                                            updatedStops[index].longitude = e.target.value;
+                                            setStops(updatedStops);
+                                        }}
+                                        required
+                                    />
+                                    {stops.length > 1 && (
+                                        <button
+                                            type="button"
+                                            class="mt-2 text-red-500 hover:text-red-600"
+                                            onClick={() => removeStop(index)}
+                                        >
+                                            Remove Stop
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <div className="mb-4">
+                                <button
+                                    type="button"
+                                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                                    onClick={addStop}
+                                >
+                                    Add Stop
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )
+            }
 
             const App = () => (
                 <div>
                     <h1>Hello, React with Babel!</h1>
                     <p>This is a React component in a single HTML file.</p>
 
-                    <WarehouseLocationForm />
+                    <WarehouseLocationForm/>
+                    <MultiStopForm/>
                 </div>
             );
 
