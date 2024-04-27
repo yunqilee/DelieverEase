@@ -139,12 +139,19 @@
 
                 const generateGoogleMapsLink = () => {
                     const baseUrl = "https://www.google.com/maps/dir/";
+
+                    // make the warehouse be the initial stop
+                    const warehouseCoordinates = `${warehouseLocation.latitude},${warehouseLocation.longitude}`;
+
+                    // filter blank coordinates, get the middle stops
                     const waypoints = stops
                         .filter((stop) => stop.latitude !== '' && stop.longitude !== '')
                         .map((stop) => `${stop.latitude},${stop.longitude}`)
                         .join("/");
-                    const warehouseCoordinates = `${warehouseLocation.latitude},${warehouseLocation.longitude}`;
-                    return baseUrl + warehouseCoordinates + "/" + waypoints;
+
+                    // generate Google Maps link, set the warehouse as initial and end stop
+                    const fullRoute = `${warehouseCoordinates}/${waypoints}/${warehouseCoordinates}`;
+                    return baseUrl + fullRoute;
                 };
 
                 return (
