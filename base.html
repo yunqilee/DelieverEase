@@ -13,6 +13,49 @@
     <body>
         <div id="root" class="p-6"></div>
         <script type="text/babel">
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // radius of the earth
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            }
+
+            function calculateDispatchPlan(warehouseLocation, stops) {
+                let totalDistance = 0;
+                let validStops = stops.filter(stop => stop.latitude && stop.longitude);
+
+                let lastLocation = warehouseLocation;
+
+                validStops.forEach((stop) => {
+                    totalDistance += calculateDistance(
+                        lastLocation.latitude,
+                        lastLocation.longitude,
+                        stop.latitude,
+                        stop.longitude
+                    );
+                    lastLocation = stop;
+                });
+
+                if (validStops.length > 0) {
+                    totalDistance += calculateDistance(
+                        lastLocation.latitude,
+                        lastLocation.longitude,
+                        warehouseLocation.latitude,
+                        warehouseLocation.longitude
+                    );
+                }
+
+                const drivingTime = totalDistance / 50;
+                const driversNeeded = Math.ceil(drivingTime / 8);
+
+                return { totalDistance, drivingTime, driversNeeded };
+            }
+
             const WarehouseLocationForm = ({warehouseLocation, setWarehouseLocation}) => {
                 const handleInputChange = (e) => {
                     const { name, value } = e.target;
@@ -213,6 +256,16 @@
                                     {stops.map((stop, index) => (
                                         <p key={index}>Stop {index + 1}: {stop.latitude}, {stop.longitude}</p>
                                     ))}
+                                    {(() => {
+                                        const { totalDistance, drivingTime, driversNeeded } = calculateDispatchPlan(warehouseLocation, stops);
+                                        return (
+                                            <>
+                                                <p>Total Distance: {totalDistance.toFixed(2)} km</p>
+                                                <p>Total Driving Time: {drivingTime.toFixed(2)} hours</p>
+                                                <p>Drivers Needed: {driversNeeded}</p>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             )}
                         </div>
